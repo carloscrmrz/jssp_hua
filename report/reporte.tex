@@ -1,0 +1,84 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{siunitx}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figuras/}}
+
+\newcommand{\figura}[2]{%
+  \IfFileExists{figuras/#1}{\includegraphics[width=#2]{#1}}{%
+    \fbox{\parbox[c][5cm][c]{#2}{\centering\ttfamily\small
+      TODO: add \texttt{figuras/#1}}}}}
+
+\lstdefinelanguage{Rust}{
+  keywords={fn,let,mut,pub,struct,impl,while,if,else,return,for,in,use,mod,
+            match,self,Self,Some,None,Ok,Err,true,false,continue,break,as},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  ndkeywords={f64,u64,usize,i32,Vec,Option,Result,String,bool},
+  ndkeywordstyle=\color{teal}\bfseries,
+  comment=[l]{//},
+  commentstyle=\color{gray}\itshape,
+  string=[b]",
+  stringstyle=\color{purple},
+  sensitive=true,
+}
+\lstset{
+  language=Rust,
+  basicstyle=\ttfamily\footnotesize,
+  numbers=left, numberstyle=\tiny\color{gray}, numbersep=6pt,
+  frame=single, framerule=0.3pt, rulecolor=\color{gray!50},
+  breaklines=true, showstringspaces=false,
+  columns=fullflexible, keepspaces=true,
+}
+
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+
+\title{TODO: Heurística \\
+       para resolver el Job Shop Scheduling Problem}
+\author{Carlos Cabrera Ramirez}
+\date{\today}
+
+% ============================================================================
+\begin{document}
+\maketitle
+
+\section{Introducción}
+TODO
+
+\section{Problema}
+\subsection{Input}
+\subsection{Solución y Función de Costo}
+
+\section{Heurística}
+\subsection{Vecindario}
+
+\section{Diseño de la Solución}
+\subsection{Código}
+\subsection{Flujo de ejecución}
+
+\section{Resultados}
+\subsection{Setup}
+\subsection{Mejores soluciones}
+\subsection{Diagramas de Gantt}
+\subsection{Convergencia}
+
+\section{Conclusión}
+
+\section*{Referencias}
+\addcontentsline{toc}{section}{Referencias}
+
+\end{document}

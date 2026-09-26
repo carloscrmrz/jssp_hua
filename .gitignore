@@ -1,0 +1,8 @@
+/target
+*.sql
+*.db
+*.tsp
+*.txt
+*.sh
+/results
+*.jssp
