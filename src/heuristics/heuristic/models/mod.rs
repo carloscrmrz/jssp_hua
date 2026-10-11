@@ -1,4 +1,3 @@
-pub mod db;
 pub mod job;
 pub mod machine;
 pub mod operation;
