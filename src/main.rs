@@ -1,14 +1,34 @@
 use clap::Parser;
+use rand::SeedableRng;
+use rand::rngs::StdRng;
+
 use crate::heuristics::heuristic::io::args::Args;
 use crate::heuristics::heuristic::io::instance_reader::InstanceReader;
+use crate::heuristics::heuristic::models::solution::Solution;
 
 mod heuristics;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
     let instance_reader = InstanceReader::new(&args);
+    let problem = instance_reader.get_parsed_instance()?;
 
-    instance_reader.get_parsed_instance();
+    let seed = args.seed.unwrap_or_else(rand::random);
+    let mut rng = StdRng::seed_from_u64(seed);
+
+    let solution = Solution::random(&problem, &mut rng);
+
+    println!(
+        "jobs: {}, machines: {}, seed: {}",
+        problem.num_jobs(),
+        problem.num_machines(),
+        seed
+    );
+    println!("lower bound: {}", problem.lower_bound());
+    println!("makespan: {}", solution.makespan());
+    for (machine_id, sequence) in solution.machine_sequences().iter().enumerate() {
+        println!("M{}: {:?}", machine_id, sequence);
+    }
 
     Ok(())
 }
