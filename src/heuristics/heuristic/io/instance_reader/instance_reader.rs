@@ -69,9 +69,14 @@ impl InstanceReader {
     fn parse_instance(raw: &str) -> Result<Problem, String> {
         let lines: Vec<&str> = raw.lines().filter(|line| !line.trim().is_empty()).collect();
 
-        let (jobs, machines) = match Self::parse_numbers(lines.first().ok_or("Empty instance")?)?[..] {
-            [j, m] => (j, m),
-            _ => return Err(String::from("Invalid first line, expected 'jobs machines'")),
+        let (jobs, machines, bounds) = match Self::parse_numbers(lines.first().ok_or("Empty instance")?)?[..] {
+            [n, m] => (n, m, None),
+            [n, m, ub, lb] => (n, m, Some((ub, lb))),
+            _ => {
+                return Err(String::from(
+                    "Invalid first line, expected 'jobs machines' or 'jobs machines upper_bound lower_bound'",
+                ));
+            }
         };
 
         let pairs = Self::get_pairs(&lines[1..])?;
@@ -80,6 +85,10 @@ impl InstanceReader {
             return Err(format!("Invalid number of jobs: {}, expected {}", pairs.len(), jobs));
         }
 
-        Problem::new(&pairs, machines)
+        let problem = Problem::new(&pairs, machines)?;
+        match bounds {
+            Some((upper_bound, lower_bound)) => problem.with_known_bounds(upper_bound, lower_bound),
+            None => Ok(problem),
+        }
     }
 }

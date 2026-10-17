@@ -5,6 +5,8 @@ use super::super::operation::Operation;
 pub struct Problem {
     jobs: Vec<Job>,
     num_machines: usize,
+    known_upper_bound: Option<usize>,
+    known_lower_bound: Option<usize>,
 }
 
 impl Problem {
@@ -53,7 +55,29 @@ impl Problem {
         Ok(Problem {
             jobs,
             num_machines,
+            known_upper_bound: None,
+            known_lower_bound: None,
         })
+    }
+
+    pub fn with_known_bounds(mut self, upper_bound: usize, lower_bound: usize) -> Result<Problem, String> {
+        if lower_bound > upper_bound {
+            return Err(format!(
+                "Lower bound {} is greater than upper bound {}",
+                lower_bound, upper_bound
+            ));
+        }
+        self.known_upper_bound = Some(upper_bound);
+        self.known_lower_bound = Some(lower_bound);
+        Ok(self)
+    }
+
+    pub fn known_upper_bound(&self) -> Option<usize> {
+        self.known_upper_bound
+    }
+
+    pub fn known_lower_bound(&self) -> Option<usize> {
+        self.known_lower_bound
     }
 
     pub fn num_jobs(&self) -> usize {
