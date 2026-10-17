@@ -74,6 +74,23 @@ impl DisjunctiveGraph {
             .unwrap_or(0))
     }
 
+    pub fn critical_path(&self) -> Result<Vec<Operation>, String> {
+        let (starts, predecessors) = self.longest_paths()?;
+
+        let mut current = self
+            .graph
+            .node_indices()
+            .max_by_key(|&node| starts[node.index()] + self.graph[node].timespan());
+
+        let mut path = vec![];
+        while let Some(node) = current {
+            path.push(self.graph[node]);
+            current = predecessors[node.index()];
+        }
+        path.reverse();
+        Ok(path)
+    }
+
     fn longest_paths(&self) -> Result<(Vec<usize>, Vec<Option<NodeIndex>>), String> {
         let order = toposort(&self.graph, None)
             .map_err(|_| String::from("Machine orders create a cycle: infeasible solution"))?;
