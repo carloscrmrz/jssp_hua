@@ -4,10 +4,12 @@ use rand::seq::SliceRandom;
 use super::super::graph::DisjunctiveGraph;
 use super::super::problem::Problem;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Solution {
     machine_sequences: Vec<Vec<usize>>,
     makespan: usize,
+    upper_bound: usize,
+    current_cost: f64
 }
 
 impl Solution {
@@ -42,9 +44,14 @@ impl Solution {
         }
 
         let makespan = DisjunctiveGraph::new(problem, &machine_sequences).makespan()?;
+        let upper_bound = problem.upper_bound();
+
+        let cost = makespan as f64 / upper_bound as f64;
         Ok(Solution {
             machine_sequences,
             makespan,
+            upper_bound,
+            current_cost: cost,
         })
     }
 
@@ -96,6 +103,10 @@ impl Solution {
 
     pub fn makespan(&self) -> usize {
         self.makespan
+    }
+
+    pub fn current_cost(&self) -> f64 {
+        self.current_cost
     }
 
     pub fn graph(&self, problem: &Problem) -> DisjunctiveGraph {

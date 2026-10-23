@@ -111,4 +111,20 @@ impl Problem {
 
         longest_job.max(busiest_machine)
     }
+
+    pub fn upper_bound(&self) -> usize {
+        let mut job_finishes = vec![0; self.num_jobs()];
+        let mut machine_finishes = vec![0; self.num_machines];
+
+        for pos in 0..self.num_machines {
+            for job in &self.jobs {
+                let operation = job.operations()[pos];
+                let finish = job_finishes[job.id()].max(machine_finishes[operation.machine_id()]) + operation.timespan();
+                job_finishes[job.id()] = finish;
+                machine_finishes[operation.machine_id()] = finish;
+            }
+        }
+
+        job_finishes.into_iter().max().unwrap_or(0)
+    }
 }

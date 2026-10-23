@@ -25,14 +25,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         seed
     );
     println!("computed lower bound: {}", problem.lower_bound());
+    println!("computed upper bound: {}", problem.upper_bound());
     if let (Some(upper_bound), Some(lower_bound)) =
         (problem.known_upper_bound(), problem.known_lower_bound())
     {
         println!("known bounds: [{}, {}]", lower_bound, upper_bound);
     }
     println!("makespan: {}", solution.makespan());
+    println!("cost: {}", solution.current_cost());
     for (machine_id, sequence) in solution.machine_sequences().iter().enumerate() {
-        println!("M{}: {:?}", machine_id, sequence);
+        // println!("M{}: {:?}", machine_id, sequence);
     }
 
     Ok(())
