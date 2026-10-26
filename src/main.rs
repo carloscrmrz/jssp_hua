@@ -36,6 +36,5 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (machine_id, sequence) in solution.machine_sequences().iter().enumerate() {
         // println!("M{}: {:?}", machine_id, sequence);
     }
-
     Ok(())
 }

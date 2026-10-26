@@ -4,3 +4,4 @@ pub mod operation;
 pub mod problem;
 pub mod solution;
 pub mod graph;
+pub mod schedule;

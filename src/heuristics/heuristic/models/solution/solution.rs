@@ -1,6 +1,6 @@
 use rand::Rng;
 use rand::seq::SliceRandom;
-
+use crate::heuristics::heuristic::models::schedule::schedule::Schedule;
 use super::super::graph::DisjunctiveGraph;
 use super::super::problem::Problem;
 
@@ -118,4 +118,10 @@ impl Solution {
             .start_times()
             .expect("a Solution is always feasible")
     }
+}
+
+#[derive(Clone)]
+pub struct Walker<'a> {
+    machine_sequences: Vec<Vec<usize>>,
+    schedule: Schedule<'a>
 }
