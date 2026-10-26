@@ -32,7 +32,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("known bounds: [{}, {}]", lower_bound, upper_bound);
     }
     println!("makespan: {}", solution.makespan());
-    println!("cost: {}", solution.current_cost());
     for (machine_id, sequence) in solution.machine_sequences().iter().enumerate() {
         // println!("M{}: {:?}", machine_id, sequence);
     }

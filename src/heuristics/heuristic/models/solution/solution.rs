@@ -8,8 +8,6 @@ use super::super::problem::Problem;
 pub struct Solution {
     machine_sequences: Vec<Vec<usize>>,
     makespan: usize,
-    upper_bound: usize,
-    current_cost: f64
 }
 
 impl Solution {
@@ -50,8 +48,6 @@ impl Solution {
         Ok(Solution {
             machine_sequences,
             makespan,
-            upper_bound,
-            current_cost: cost,
         })
     }
 
@@ -105,10 +101,6 @@ impl Solution {
         self.makespan
     }
 
-    pub fn current_cost(&self) -> f64 {
-        self.current_cost
-    }
-
     pub fn graph(&self, problem: &Problem) -> DisjunctiveGraph {
         DisjunctiveGraph::new(problem, &self.machine_sequences)
     }
@@ -123,5 +115,37 @@ impl Solution {
 #[derive(Clone)]
 pub struct Walker<'a> {
     machine_sequences: Vec<Vec<usize>>,
-    schedule: Schedule<'a>
+    schedule: Schedule<'a>,
+}
+
+impl<'a> Walker<'a> {
+    pub fn new(problem: &'a Problem, solution: &Solution) -> Walker<'a> {
+        Walker {
+            machine_sequences: solution.machine_sequences.clone(),
+            schedule: Schedule::new(problem, &solution.machine_sequences).expect("a solution is always feasible"),
+        }
+    }
+
+    pub fn makespan(&self) -> usize {
+        self.schedule.makespan()
+    }
+
+    pub fn solution(&self) -> Solution {
+        Solution {
+            machine_sequences: self.machine_sequences.clone(),
+            makespan: self.schedule.makespan(),
+        }
+    }
+
+    pub fn swap(&mut self, machine_id: usize, first: usize, second: usize) -> Result<(), String> {
+        let sequence = &self.machine_sequences[machine_id];
+        let operation_idx = |job_id: usize| {
+            job_id * self.schedule.problem().num_machines() + self.schedule.problem().position_on(job_id, machine_id)
+        };
+        self.schedule
+            .exchange(operation_idx(sequence[first]), operation_idx(sequence[second]))
+            .expect("Only operations on the same machine can be swapped");
+        self.machine_sequences[machine_id].swap(first, second);
+        Ok(())
+    }
 }

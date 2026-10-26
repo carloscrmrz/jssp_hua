@@ -136,4 +136,56 @@ impl<'a> Schedule<'a> {
             .max_by_key(|&operation| (self.finishes[operation], std::cmp::Reverse(self.order_positions[operation])))
             .unwrap_or(0);
     }
+
+    pub fn exchange(&mut self, first: usize, second: usize) -> Result<(), String> {
+        if self.operation(first).machine_id() != self.operation(second).machine_id() {
+            return Err(String::from("Only operations on the same machine can be swapped"))
+        }
+
+        if first == second { return Ok(()); }
+        let (first, second) = if self.machine_positions[first] < self.machine_positions[second] {
+            (first, second)
+        } else {
+            (second, first)
+        };
+
+        let (start, end) = (self.order_positions[first], self.order_positions[second]);
+        self.exchange_links(start, end);
+        if !self.reorder(start, end) {
+            self.exchange_links(second, first);
+            return Err(String::from("Cycle detected: infeasible solution"));
+        }
+
+        self.update_finishes(start);
+        Ok(())
+    }
+
+    fn exchange_links(&mut self, first: usize, second: usize) {
+        let none = self.order.len();
+        let before_first = self.machine_predecessors[first];
+        let after_second = self.machine_successors[second];
+        if before_first != none {
+            self.machine_successors[before_first] = second;
+        }
+        if after_second != none {
+            self.machine_predecessors[after_second] = first;
+        }
+
+        if self.machine_successors[first] == second {
+            self.machine_predecessors[second] = before_first;
+            self.machine_successors[second] = first;
+            self.machine_predecessors[first] = second;
+            self.machine_successors[first] = after_second;
+        } else {
+            let after_first = self.machine_successors[first];
+            let before_second = self.machine_predecessors[second];
+            self.machine_predecessors[after_first] = second;
+            self.machine_successors[before_second] = first;
+            self.machine_predecessors[second] = before_first;
+            self.machine_successors[second] = after_first;
+            self.machine_predecessors[first] = before_second;
+            self.machine_successors[first] = after_second;
+        }
+        self.machine_positions.swap(first, second);
+    }
 }
