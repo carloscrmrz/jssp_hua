@@ -88,7 +88,7 @@ impl<'a> Schedule<'a> {
             let operation = self.order[i];
             let pending = [self.problem.job_predecessors()[operation], self.machine_predecessors[operation]]
                 .into_iter()
-                .filter(|&p| inside(&self.order, p))
+                .filter(|&p| inside(&self.order_positions, p))
                 .count();
             self.pending[operation] = pending;
             if pending == 0 {
@@ -150,7 +150,7 @@ impl<'a> Schedule<'a> {
         };
 
         let (start, end) = (self.order_positions[first], self.order_positions[second]);
-        self.exchange_links(start, end);
+        self.exchange_links(first, second);
         if !self.reorder(start, end) {
             self.exchange_links(second, first);
             return Err(String::from("Cycle detected: infeasible solution"));
@@ -187,5 +187,37 @@ impl<'a> Schedule<'a> {
             self.machine_successors[first] = after_second;
         }
         self.machine_positions.swap(first, second);
+    }
+
+    pub fn critical_path(&self) -> Vec<usize> {
+        let mut path = vec![self.last];
+        let mut operation = self.last;
+        loop {
+            let head = self.head(operation);
+            if head == 0 { break; }
+
+            let job_predecessor = self.problem.job_predecessors()[operation];
+            operation = if self.finishes[job_predecessor] == head {
+                job_predecessor
+            } else {
+                self.machine_predecessors[operation]
+            };
+            path.push(operation);
+        }
+        path.reverse();
+        path
+    }
+
+    fn head(&self, operation: usize) -> usize {
+        self.finishes[operation] - self.problem.timespans()[operation]
+    }
+
+    pub fn swap_with_next(&mut self, operation: usize) -> Result<(), String> {
+        let next = self.machine_successors[operation];
+        if next == self.order.len()
+        {
+            return Err(String::from("Last operation of the machine, nothing to swap"));
+        }
+        self.exchange(operation, next)
     }
 }
