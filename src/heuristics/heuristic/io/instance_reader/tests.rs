@@ -7,6 +7,13 @@ fn args_with_raw_instance(raw: &str) -> Args {
         instance_path: None,
         seed: None,
         threads: None,
+        variant: 0,
+        iterations: None,
+        k: None,
+        rimpk: None,
+        radius_scale: None,
+        adventurer_swaps: None,
+        local_rounds: None,
     }
 }
 
