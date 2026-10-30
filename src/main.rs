@@ -5,12 +5,14 @@ use crate::heuristics::heuristic::hua::hua;
 use crate::heuristics::heuristic::hua::hua::Parameters;
 use crate::heuristics::heuristic::io::args::Args;
 use crate::heuristics::heuristic::io::instance_reader::InstanceReader;
+use crate::heuristics::heuristic::io::instance_writer::{InstanceWriter, Report};
 use crate::heuristics::heuristic::models::solution::Solution;
 
 mod heuristics;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Args::parse();
+    let writer = InstanceWriter::new(None);
     let instance_reader = InstanceReader::new(&args);
     let problem = instance_reader.get_parsed_instance()?;
 
@@ -44,20 +46,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let solution = outcome.best;
     let iterations_run = outcome.history.len();
 
-    let solution = Solution::random(&problem, &mut rng);
-
-    println!(
-        "jobs: {}, machines: {}, seed: {}, HUS variant: {}",
-        problem.num_jobs(),
-        problem.num_machines(),
+    let report = Report {
+        problem: &problem,
+        solution: &solution,
         seed,
-        args.variant
-    );
-    println!("computed lower bound: {}", problem.lower_bound());
-    println!("computed upper bound: {}", problem.upper_bound());
-    println!("makespan: {}", solution.makespan());
-    // for (machine_id, sequence) in solution.machine_sequences().iter().enumerate() {
-    //     // println!("M{}: {:?}", machine_id, sequence);
-    // }
+        variant: args.variant,
+        iterations: parameters.iterations,
+        iterations_run,
+        initial_makespan: outcome.history[0],
+        cancelled: outcome.cancelled,
+    };
+    if let Err(message) = writer.write_instance(&report) {
+        //writer.fail(message);
+    }
     Ok(())
 }
